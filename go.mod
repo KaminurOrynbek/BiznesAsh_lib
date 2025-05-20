@@ -3,7 +3,9 @@ module github.com/KaminurOrynbek/BiznesAsh_lib
 go 1.24.1
 
 require (
+	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.10.9
 	github.com/nats-io/nats.go v1.42.0
 	github.com/redis/go-redis/v9 v9.8.0
 )

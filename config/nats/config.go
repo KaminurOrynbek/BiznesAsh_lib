@@ -14,7 +14,7 @@ type Config struct {
 	NATSTimeout       time.Duration
 }
 
-func LoadConfig() *Config {
+func LoadNatsConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
