@@ -17,6 +17,7 @@ service NotificationService {
   rpc UnsubscribeFromUpdates(UserID) returns (NotificationResponse);
   rpc GetSubscriptions(UserID) returns (SubscriptionsResponse);
   rpc ResendVerificationCode(UserID) returns (NotificationResponse);
+  rpc SendLikeNotification(LikeNotification) returns (NotificationResponse);
 }
 
 message EmailRequest {
@@ -69,4 +70,10 @@ message NotificationResponse {
 
 message SubscriptionsResponse {
   repeated string subscriptions = 1;
+}
+
+message LikeNotification {
+  string senderId = 1;
+  string receiverEmail = 2;
+  string postId = 3;
 }

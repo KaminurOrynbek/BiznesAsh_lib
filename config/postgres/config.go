@@ -20,7 +20,7 @@ func LoadPostgresConfig() *PostgresConfig {
 		Port:     getEnv("POSTGRES_PORT", "5432"),
 		User:     getEnv("POSTGRES_USER", "postgres"),
 		Password: getEnv("POSTGRES_PASSWORD", "0000"),
-		DBName:   getEnv("POSTGRES_DB", "postgres"),
+		DBName:   getEnv("POSTGRES_DB", "biznesAsh"),
 		SSLMode:  getEnv("POSTGRES_SSLMODE", "disable"),
 	}
 }
