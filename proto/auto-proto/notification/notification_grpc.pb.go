@@ -28,13 +28,12 @@ type NotificationServiceClient interface {
 	NotifyNewPost(ctx context.Context, in *NewPostNotification, opts ...grpc.CallOption) (*NotificationResponse, error)
 	NotifyPostUpdate(ctx context.Context, in *PostUpdateNotification, opts ...grpc.CallOption) (*NotificationResponse, error)
 	SendVerificationEmail(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*NotificationResponse, error)
-	VerifyEmail(ctx context.Context, in *VerificationCode, opts ...grpc.CallOption) (*NotificationResponse, error)
 	NotifySystemMessage(ctx context.Context, in *SystemMessageRequest, opts ...grpc.CallOption) (*NotificationResponse, error)
 	SubscribeToUpdates(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*NotificationResponse, error)
 	UnsubscribeFromUpdates(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*NotificationResponse, error)
 	GetSubscriptions(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*SubscriptionsResponse, error)
-	ResendVerificationCode(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*NotificationResponse, error)
-	SendLikeNotification(ctx context.Context, in *LikeNotification, opts ...grpc.CallOption) (*NotificationResponse, error)
+	NotifyPostLike(ctx context.Context, in *PostLikeNotification, opts ...grpc.CallOption) (*NotificationResponse, error)
+	NotifyCommentLike(ctx context.Context, in *CommentLikeNotification, opts ...grpc.CallOption) (*NotificationResponse, error)
 }
 
 type notificationServiceClient struct {
@@ -99,15 +98,6 @@ func (c *notificationServiceClient) SendVerificationEmail(ctx context.Context, i
 	return out, nil
 }
 
-func (c *notificationServiceClient) VerifyEmail(ctx context.Context, in *VerificationCode, opts ...grpc.CallOption) (*NotificationResponse, error) {
-	out := new(NotificationResponse)
-	err := c.cc.Invoke(ctx, "/notification.NotificationService/VerifyEmail", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *notificationServiceClient) NotifySystemMessage(ctx context.Context, in *SystemMessageRequest, opts ...grpc.CallOption) (*NotificationResponse, error) {
 	out := new(NotificationResponse)
 	err := c.cc.Invoke(ctx, "/notification.NotificationService/NotifySystemMessage", in, out, opts...)
@@ -144,18 +134,18 @@ func (c *notificationServiceClient) GetSubscriptions(ctx context.Context, in *Us
 	return out, nil
 }
 
-func (c *notificationServiceClient) ResendVerificationCode(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*NotificationResponse, error) {
+func (c *notificationServiceClient) NotifyPostLike(ctx context.Context, in *PostLikeNotification, opts ...grpc.CallOption) (*NotificationResponse, error) {
 	out := new(NotificationResponse)
-	err := c.cc.Invoke(ctx, "/notification.NotificationService/ResendVerificationCode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/notification.NotificationService/NotifyPostLike", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *notificationServiceClient) SendLikeNotification(ctx context.Context, in *LikeNotification, opts ...grpc.CallOption) (*NotificationResponse, error) {
+func (c *notificationServiceClient) NotifyCommentLike(ctx context.Context, in *CommentLikeNotification, opts ...grpc.CallOption) (*NotificationResponse, error) {
 	out := new(NotificationResponse)
-	err := c.cc.Invoke(ctx, "/notification.NotificationService/SendLikeNotification", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/notification.NotificationService/NotifyCommentLike", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -172,13 +162,12 @@ type NotificationServiceServer interface {
 	NotifyNewPost(context.Context, *NewPostNotification) (*NotificationResponse, error)
 	NotifyPostUpdate(context.Context, *PostUpdateNotification) (*NotificationResponse, error)
 	SendVerificationEmail(context.Context, *EmailRequest) (*NotificationResponse, error)
-	VerifyEmail(context.Context, *VerificationCode) (*NotificationResponse, error)
 	NotifySystemMessage(context.Context, *SystemMessageRequest) (*NotificationResponse, error)
 	SubscribeToUpdates(context.Context, *UserID) (*NotificationResponse, error)
 	UnsubscribeFromUpdates(context.Context, *UserID) (*NotificationResponse, error)
 	GetSubscriptions(context.Context, *UserID) (*SubscriptionsResponse, error)
-	ResendVerificationCode(context.Context, *UserID) (*NotificationResponse, error)
-	SendLikeNotification(context.Context, *LikeNotification) (*NotificationResponse, error)
+	NotifyPostLike(context.Context, *PostLikeNotification) (*NotificationResponse, error)
+	NotifyCommentLike(context.Context, *CommentLikeNotification) (*NotificationResponse, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -204,9 +193,6 @@ func (UnimplementedNotificationServiceServer) NotifyPostUpdate(context.Context, 
 func (UnimplementedNotificationServiceServer) SendVerificationEmail(context.Context, *EmailRequest) (*NotificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendVerificationEmail not implemented")
 }
-func (UnimplementedNotificationServiceServer) VerifyEmail(context.Context, *VerificationCode) (*NotificationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
-}
 func (UnimplementedNotificationServiceServer) NotifySystemMessage(context.Context, *SystemMessageRequest) (*NotificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NotifySystemMessage not implemented")
 }
@@ -219,11 +205,11 @@ func (UnimplementedNotificationServiceServer) UnsubscribeFromUpdates(context.Con
 func (UnimplementedNotificationServiceServer) GetSubscriptions(context.Context, *UserID) (*SubscriptionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptions not implemented")
 }
-func (UnimplementedNotificationServiceServer) ResendVerificationCode(context.Context, *UserID) (*NotificationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ResendVerificationCode not implemented")
+func (UnimplementedNotificationServiceServer) NotifyPostLike(context.Context, *PostLikeNotification) (*NotificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NotifyPostLike not implemented")
 }
-func (UnimplementedNotificationServiceServer) SendLikeNotification(context.Context, *LikeNotification) (*NotificationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendLikeNotification not implemented")
+func (UnimplementedNotificationServiceServer) NotifyCommentLike(context.Context, *CommentLikeNotification) (*NotificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NotifyCommentLike not implemented")
 }
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 
@@ -346,24 +332,6 @@ func _NotificationService_SendVerificationEmail_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotificationService_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerificationCode)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NotificationServiceServer).VerifyEmail(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/notification.NotificationService/VerifyEmail",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServiceServer).VerifyEmail(ctx, req.(*VerificationCode))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _NotificationService_NotifySystemMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SystemMessageRequest)
 	if err := dec(in); err != nil {
@@ -436,38 +404,38 @@ func _NotificationService_GetSubscriptions_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotificationService_ResendVerificationCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
+func _NotificationService_NotifyPostLike_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostLikeNotification)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NotificationServiceServer).ResendVerificationCode(ctx, in)
+		return srv.(NotificationServiceServer).NotifyPostLike(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/notification.NotificationService/ResendVerificationCode",
+		FullMethod: "/notification.NotificationService/NotifyPostLike",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServiceServer).ResendVerificationCode(ctx, req.(*UserID))
+		return srv.(NotificationServiceServer).NotifyPostLike(ctx, req.(*PostLikeNotification))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotificationService_SendLikeNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LikeNotification)
+func _NotificationService_NotifyCommentLike_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommentLikeNotification)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NotificationServiceServer).SendLikeNotification(ctx, in)
+		return srv.(NotificationServiceServer).NotifyCommentLike(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/notification.NotificationService/SendLikeNotification",
+		FullMethod: "/notification.NotificationService/NotifyCommentLike",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServiceServer).SendLikeNotification(ctx, req.(*LikeNotification))
+		return srv.(NotificationServiceServer).NotifyCommentLike(ctx, req.(*CommentLikeNotification))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -504,10 +472,6 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NotificationService_SendVerificationEmail_Handler,
 		},
 		{
-			MethodName: "VerifyEmail",
-			Handler:    _NotificationService_VerifyEmail_Handler,
-		},
-		{
 			MethodName: "NotifySystemMessage",
 			Handler:    _NotificationService_NotifySystemMessage_Handler,
 		},
@@ -524,12 +488,12 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NotificationService_GetSubscriptions_Handler,
 		},
 		{
-			MethodName: "ResendVerificationCode",
-			Handler:    _NotificationService_ResendVerificationCode_Handler,
+			MethodName: "NotifyPostLike",
+			Handler:    _NotificationService_NotifyPostLike_Handler,
 		},
 		{
-			MethodName: "SendLikeNotification",
-			Handler:    _NotificationService_SendLikeNotification_Handler,
+			MethodName: "NotifyCommentLike",
+			Handler:    _NotificationService_NotifyCommentLike_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

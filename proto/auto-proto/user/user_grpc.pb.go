@@ -22,25 +22,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	// Аутентификация
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Authorize(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*AuthorizationResponse, error)
-	// Аутентификация через OTP код
-	VerifyOtp(ctx context.Context, in *VerifyOtpRequest, opts ...grpc.CallOption) (*VerifyOtpResponse, error)
-	// Работа с профилем
 	GetCurrentUser(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*UserResponse, error)
-	// Работа с ролями
 	PromoteToModerator(ctx context.Context, in *RoleChangeRequest, opts ...grpc.CallOption) (*RoleChangeResponse, error)
 	PromoteToAdmin(ctx context.Context, in *RoleChangeRequest, opts ...grpc.CallOption) (*RoleChangeResponse, error)
 	DemoteToUser(ctx context.Context, in *RoleChangeRequest, opts ...grpc.CallOption) (*RoleChangeResponse, error)
-	// Удаление аккаунта
 	DeleteAccount(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*DeleteResponse, error)
-	// Получение списка пользователей
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*UsersListResponse, error)
-	// Блокировка пользователя
 	BanUser(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*BanUserResponse, error)
 }
 
@@ -73,15 +65,6 @@ func (c *userServiceClient) Login(ctx context.Context, in *LoginRequest, opts ..
 func (c *userServiceClient) Authorize(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*AuthorizationResponse, error) {
 	out := new(AuthorizationResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/Authorize", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) VerifyOtp(ctx context.Context, in *VerifyOtpRequest, opts ...grpc.CallOption) (*VerifyOtpResponse, error) {
-	out := new(VerifyOtpResponse)
-	err := c.cc.Invoke(ctx, "/user.UserService/VerifyOtp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -173,25 +156,17 @@ func (c *userServiceClient) BanUser(ctx context.Context, in *UserID, opts ...grp
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	// Аутентификация
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Authorize(context.Context, *TokenRequest) (*AuthorizationResponse, error)
-	// Аутентификация через OTP код
-	VerifyOtp(context.Context, *VerifyOtpRequest) (*VerifyOtpResponse, error)
-	// Работа с профилем
 	GetCurrentUser(context.Context, *Empty) (*UserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*UserResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*UserResponse, error)
-	// Работа с ролями
 	PromoteToModerator(context.Context, *RoleChangeRequest) (*RoleChangeResponse, error)
 	PromoteToAdmin(context.Context, *RoleChangeRequest) (*RoleChangeResponse, error)
 	DemoteToUser(context.Context, *RoleChangeRequest) (*RoleChangeResponse, error)
-	// Удаление аккаунта
 	DeleteAccount(context.Context, *UserID) (*DeleteResponse, error)
-	// Получение списка пользователей
 	ListUsers(context.Context, *ListUsersRequest) (*UsersListResponse, error)
-	// Блокировка пользователя
 	BanUser(context.Context, *UserID) (*BanUserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
@@ -208,9 +183,6 @@ func (UnimplementedUserServiceServer) Login(context.Context, *LoginRequest) (*Lo
 }
 func (UnimplementedUserServiceServer) Authorize(context.Context, *TokenRequest) (*AuthorizationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authorize not implemented")
-}
-func (UnimplementedUserServiceServer) VerifyOtp(context.Context, *VerifyOtpRequest) (*VerifyOtpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyOtp not implemented")
 }
 func (UnimplementedUserServiceServer) GetCurrentUser(context.Context, *Empty) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCurrentUser not implemented")
@@ -302,24 +274,6 @@ func _UserService_Authorize_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Authorize(ctx, req.(*TokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_VerifyOtp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerifyOtpRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).VerifyOtp(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.UserService/VerifyOtp",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).VerifyOtp(ctx, req.(*VerifyOtpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -504,10 +458,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Authorize",
 			Handler:    _UserService_Authorize_Handler,
-		},
-		{
-			MethodName: "VerifyOtp",
-			Handler:    _UserService_VerifyOtp_Handler,
 		},
 		{
 			MethodName: "GetCurrentUser",

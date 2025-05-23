@@ -2,38 +2,89 @@ syntax = "proto3";
 
 package user;
 
+import "google/api/annotations.proto";
+
 option go_package = "github.com/KaminurOrynbek/BiznesAsh/UserService/auto-proto";
 
 service UserService {
-  // Аутентификация
-  rpc Register(RegisterRequest) returns (RegisterResponse);
-  rpc Login(LoginRequest) returns (LoginResponse);
-  rpc Authorize(TokenRequest) returns (AuthorizationResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/register"
+      body: "*"
+    };
+  }
 
-  // Аутентификация через OTP код
-  rpc VerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/login"
+      body: "*"
+    };
+  }
 
-  // Работа с профилем
-  rpc GetCurrentUser(Empty) returns (UserResponse);
-  rpc GetUser(GetUserRequest) returns (UserResponse);
-  rpc UpdateProfile(UpdateProfileRequest) returns (UserResponse);
+  rpc Authorize(TokenRequest) returns (AuthorizationResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/authorize"
+      body: "*"
+    };
+  }
 
-  // Работа с ролями
-  rpc PromoteToModerator(RoleChangeRequest) returns (RoleChangeResponse);
-  rpc PromoteToAdmin(RoleChangeRequest) returns (RoleChangeResponse);
-  rpc DemoteToUser(RoleChangeRequest) returns (RoleChangeResponse);
+  rpc GetCurrentUser(Empty) returns (UserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/me"
+    };
+  }
 
-  // Удаление аккаунта
-  rpc DeleteAccount(UserID) returns (DeleteResponse);
+  rpc GetUser(GetUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{userId}"
+    };
+  }
 
-  // Получение списка пользователей
-  rpc ListUsers(ListUsersRequest) returns (UsersListResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      put: "/v1/users/profile"
+      body: "*"
+    };
+  }
 
-  // Блокировка пользователя
-  rpc BanUser(UserID) returns (BanUserResponse);
+  rpc PromoteToModerator(RoleChangeRequest) returns (RoleChangeResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{userId}/promote/moderator"
+    };
+  }
+
+  rpc PromoteToAdmin(RoleChangeRequest) returns (RoleChangeResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{userId}/promote/admin"
+    };
+  }
+
+  rpc DemoteToUser(RoleChangeRequest) returns (RoleChangeResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{userId}/demote"
+    };
+  }
+
+  rpc DeleteAccount(UserID) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/users/{userId}"
+    };
+  }
+
+  rpc ListUsers(ListUsersRequest) returns (UsersListResponse) {
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  }
+
+  rpc BanUser(UserID) returns (BanUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{userId}/ban"
+    };
+  }
 }
 
-// Сообщения для запросов и ответов
+// Messages
 
 message RegisterRequest {
   string email = 1;
@@ -46,7 +97,7 @@ message RegisterResponse {
   string username = 2;
   string email = 3;
   string role = 4;
-  string token = 5;  // Токен для авторизации
+  string token = 5;
 }
 
 message LoginRequest {
@@ -118,14 +169,3 @@ message BanUserResponse {
 }
 
 message Empty {}
-
-message VerifyOtpRequest {
-  string userId = 1;
-  string otpCode = 2;
-}
-
-message VerifyOtpResponse {
-  bool success = 1;
-  string message = 2;
-  string token = 3;  // Токен после успешной верификации OTP
-}

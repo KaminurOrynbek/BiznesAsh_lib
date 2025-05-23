@@ -1,32 +1,107 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
 package content;
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/KaminurOrynbek/BiznesAsh/ContentService/auto-proto";
 
 service ContentService {
-  rpc CreatePost(CreatePostRequest) returns (PostResponse);
-  rpc UpdatePost(UpdatePostRequest) returns (PostResponse);
-  rpc DeletePost(PostIdRequest) returns (DeleteResponse);
-  rpc GetPost(PostIdRequest) returns (PostResponse);
-  rpc ListPosts(ListPostsRequest) returns (ListPostsResponse);
-  rpc SearchPosts(SearchPostsRequest) returns (ListPostsResponse);
+  rpc CreatePost(CreatePostRequest) returns (PostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts"
+      body: "*"
+    };
+  }
 
-  rpc CreateComment(CreateCommentRequest) returns (CommentResponse);
-  rpc UpdateComment(UpdateCommentRequest) returns (CommentResponse);
-  rpc DeleteComment(CommentIdRequest) returns (DeleteResponse);
-  rpc ListComments(ListCommentsRequest) returns (ListCommentsResponse);
+  rpc UpdatePost(UpdatePostRequest) returns (PostResponse) {
+    option (google.api.http) = {
+      put: "/v1/posts"
+      body: "*"
+    };
+  }
 
-  rpc LikePost(LikePostRequest) returns (LikePostResponse);
-  rpc DislikePost(DislikePostRequest) returns (DislikePostResponse);
+  rpc DeletePost(PostIdRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/posts/{id}"
+    };
+  }
+
+  rpc GetPost(PostIdRequest) returns (PostResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/{id}"
+    };
+  }
+
+  rpc ListPosts(ListPostsRequest) returns (ListPostsResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts"
+    };
+  }
+
+  rpc SearchPosts(SearchPostsRequest) returns (ListPostsResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/search"
+    };
+  }
+
+  rpc CreateComment(CreateCommentRequest) returns (CommentResponse) {
+    option (google.api.http) = {
+      post: "/v1/comments"
+      body: "*"
+    };
+  }
+
+  rpc UpdateComment(UpdateCommentRequest) returns (CommentResponse) {
+    option (google.api.http) = {
+      put: "/v1/comments"
+      body: "*"
+    };
+  }
+
+  rpc DeleteComment(CommentIdRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/v1/comments/{id}"
+    };
+  }
+
+  rpc ListComments(ListCommentsRequest) returns (ListCommentsResponse) {
+    option (google.api.http) = {
+      get: "/v1/posts/{post_id}/comments"
+    };
+  }
+
+  rpc LikePost(LikePostRequest) returns (LikePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/like"
+      body: "*"
+    };
+  }
+
+  rpc DislikePost(DislikePostRequest) returns (DislikePostResponse) {
+    option (google.api.http) = {
+      post: "/v1/posts/{post_id}/dislike"
+      body: "*"
+    };
+  }
+
+  rpc LikeComment(LikeCommentRequest) returns (LikeCommentResponse) {
+    option (google.api.http) = {
+      post: "/v1/comments/{comment_id}/like"
+      body: "*"
+    };
+  }
 }
+
+// Enums
 
 enum PostType {
   LEGAL_INFO = 0;
   GUIDE = 1;
 }
+
+// Models
 
 message Post {
   string id = 1;
@@ -134,7 +209,6 @@ message ListCommentsRequest {
   string post_id = 1;
 }
 
-
 message LikePostRequest {
   string post_id = 1;
   string user_id = 2;
@@ -151,4 +225,13 @@ message LikePostResponse {
 
 message DislikePostResponse {
   int32 dislikes_count = 1;
+}
+
+message LikeCommentRequest {
+  string comment_id = 1;
+  string user_id = 2;
+}
+
+message LikeCommentResponse {
+  int32 likes_count = 1;
 }

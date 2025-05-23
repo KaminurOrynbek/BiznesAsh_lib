@@ -34,6 +34,7 @@ type ContentServiceClient interface {
 	ListComments(ctx context.Context, in *ListCommentsRequest, opts ...grpc.CallOption) (*ListCommentsResponse, error)
 	LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*LikePostResponse, error)
 	DislikePost(ctx context.Context, in *DislikePostRequest, opts ...grpc.CallOption) (*DislikePostResponse, error)
+	LikeComment(ctx context.Context, in *LikeCommentRequest, opts ...grpc.CallOption) (*LikeCommentResponse, error)
 }
 
 type contentServiceClient struct {
@@ -152,6 +153,15 @@ func (c *contentServiceClient) DislikePost(ctx context.Context, in *DislikePostR
 	return out, nil
 }
 
+func (c *contentServiceClient) LikeComment(ctx context.Context, in *LikeCommentRequest, opts ...grpc.CallOption) (*LikeCommentResponse, error) {
+	out := new(LikeCommentResponse)
+	err := c.cc.Invoke(ctx, "/content.ContentService/LikeComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ContentServiceServer is the server API for ContentService service.
 // All implementations must embed UnimplementedContentServiceServer
 // for forward compatibility
@@ -168,6 +178,7 @@ type ContentServiceServer interface {
 	ListComments(context.Context, *ListCommentsRequest) (*ListCommentsResponse, error)
 	LikePost(context.Context, *LikePostRequest) (*LikePostResponse, error)
 	DislikePost(context.Context, *DislikePostRequest) (*DislikePostResponse, error)
+	LikeComment(context.Context, *LikeCommentRequest) (*LikeCommentResponse, error)
 	mustEmbedUnimplementedContentServiceServer()
 }
 
@@ -210,6 +221,9 @@ func (UnimplementedContentServiceServer) LikePost(context.Context, *LikePostRequ
 }
 func (UnimplementedContentServiceServer) DislikePost(context.Context, *DislikePostRequest) (*DislikePostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DislikePost not implemented")
+}
+func (UnimplementedContentServiceServer) LikeComment(context.Context, *LikeCommentRequest) (*LikeCommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LikeComment not implemented")
 }
 func (UnimplementedContentServiceServer) mustEmbedUnimplementedContentServiceServer() {}
 
@@ -440,6 +454,24 @@ func _ContentService_DislikePost_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_LikeComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikeCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).LikeComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/content.ContentService/LikeComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).LikeComment(ctx, req.(*LikeCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ContentService_ServiceDesc is the grpc.ServiceDesc for ContentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -494,6 +526,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DislikePost",
 			Handler:    _ContentService_DislikePost_Handler,
+		},
+		{
+			MethodName: "LikeComment",
+			Handler:    _ContentService_LikeComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

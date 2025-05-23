@@ -2,23 +2,96 @@ syntax = "proto3";
 
 package notification;
 
+import "google/api/annotations.proto";
+
 option go_package = "github.com/KaminurOrynbek/BiznesAsh/NotificationService/auto-proto";
 
 service NotificationService {
-  rpc SendWelcomeEmail(EmailRequest) returns (NotificationResponse);
-  rpc SendCommentNotification(CommentNotification) returns (NotificationResponse);
-  rpc SendReportNotification(ReportNotification) returns (NotificationResponse);
-  rpc NotifyNewPost(NewPostNotification) returns (NotificationResponse);
-  rpc NotifyPostUpdate(PostUpdateNotification) returns (NotificationResponse);
-  rpc SendVerificationEmail(EmailRequest) returns (NotificationResponse);
-  rpc VerifyEmail(VerificationCode) returns (NotificationResponse);
-  rpc NotifySystemMessage(SystemMessageRequest) returns (NotificationResponse);
-  rpc SubscribeToUpdates(UserID) returns (NotificationResponse);
-  rpc UnsubscribeFromUpdates(UserID) returns (NotificationResponse);
-  rpc GetSubscriptions(UserID) returns (SubscriptionsResponse);
-  rpc ResendVerificationCode(UserID) returns (NotificationResponse);
-  rpc SendLikeNotification(LikeNotification) returns (NotificationResponse);
+  rpc SendWelcomeEmail(EmailRequest) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/welcome"
+      body: "*"
+    };
+  }
+
+  rpc SendCommentNotification(CommentNotification) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/comment"
+      body: "*"
+    };
+  }
+
+  rpc SendReportNotification(ReportNotification) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/report"
+      body: "*"
+    };
+  }
+
+  rpc NotifyNewPost(NewPostNotification) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/newpost"
+      body: "*"
+    };
+  }
+
+  rpc NotifyPostUpdate(PostUpdateNotification) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/updatepost"
+      body: "*"
+    };
+  }
+
+  rpc SendVerificationEmail(EmailRequest) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/verify-email"
+      body: "*"
+    };
+  }
+
+  rpc NotifySystemMessage(SystemMessageRequest) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/system"
+      body: "*"
+    };
+  }
+
+  rpc SubscribeToUpdates(UserID) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/subscribe"
+      body: "*"
+    };
+  }
+
+  rpc UnsubscribeFromUpdates(UserID) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/unsubscribe"
+      body: "*"
+    };
+  }
+
+  rpc GetSubscriptions(UserID) returns (SubscriptionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/notifications/subscriptions/{userId}"
+    };
+  }
+
+  rpc NotifyPostLike(PostLikeNotification) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/post-like"
+      body: "*"
+    };
+  }
+
+  rpc NotifyCommentLike(CommentLikeNotification) returns (NotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications/comment-like"
+      body: "*"
+    };
+  }
 }
+
+// Messages
 
 message EmailRequest {
   string email = 1;
@@ -27,35 +100,41 @@ message EmailRequest {
 }
 
 message CommentNotification {
-  string email = 1;
+  string userId = 1;
   string postId = 2;
   string commentText = 3;
+  string timestamp = 4;
 }
 
 message ReportNotification {
-  string email = 1;
+  string userId = 1;
   string postId = 2;
   string reason = 3;
 }
 
 message NewPostNotification {
-  string email = 1;
+  string userId = 1;
   string postTitle = 2;
 }
 
 message PostUpdateNotification {
-  string email = 1;
+  string userId = 1;
   string postId = 2;
   string updateSummary = 3;
 }
 
-message VerificationCode {
-  string email = 1;
-  string code = 2;
+message PostLikeNotification {
+  string userId = 1;
+  string postId = 2;
+}
+
+message CommentLikeNotification {
+  string userId = 1;
+  string commentId = 2;
 }
 
 message SystemMessageRequest {
-  string email = 1;
+  string userId = 1;
   string message = 2;
 }
 
@@ -70,10 +149,4 @@ message NotificationResponse {
 
 message SubscriptionsResponse {
   repeated string subscriptions = 1;
-}
-
-message LikeNotification {
-  string senderId = 1;
-  string receiverEmail = 2;
-  string postId = 3;
 }
